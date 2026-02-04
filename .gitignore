@@ -92,3 +92,6 @@ af.cmd
 
 # playwright
 storageState.json
+
+# Local Models
+packages/frontend/core/public/models

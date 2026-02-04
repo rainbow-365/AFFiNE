@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { GlobalDialogs } from '../../dialogs';
+import { NexusDebugPanel } from '../../modules/nexus-ai/view/debug-panel';
 import { CustomThemeModifier } from './custom-theme';
 import { FindInPagePopup } from './find-in-page/find-in-page-popup';
 
@@ -20,7 +21,11 @@ export const RootWrapper = () => {
     defaultServerService.server
       .waitForConfigRevalidation(abortController.signal)
       .then(() => setIsServerReady(true))
-      .catch(console.error);
+      .catch(e => {
+        console.error(e);
+        // Fallback for Sovereign Mode (no server)
+        setIsServerReady(true);
+      });
     return () => abortController.abort();
   }, [defaultServerService, isServerReady]);
 
@@ -31,6 +36,7 @@ export const RootWrapper = () => {
       <Outlet />
       <CustomThemeModifier />
       {BUILD_CONFIG.isElectron && <FindInPagePopup />}
+      <NexusDebugPanel />
     </FrameworkScope>
   );
 };

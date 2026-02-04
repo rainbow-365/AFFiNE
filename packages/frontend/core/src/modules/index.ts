@@ -41,6 +41,7 @@ import { configureLifecycleModule } from './lifecycle';
 import { configureMediaModule } from './media';
 import { configureNavigationModule } from './navigation';
 import { configureNavigationPanelModule } from './navigation-panel';
+import { configureNexusAIModule } from './nexus-ai';
 import { configureNotificationModule } from './notification';
 import { configureOpenInApp } from './open-in-app';
 import { configureOrganizeModule } from './organize';
@@ -80,12 +81,12 @@ export function configureCommonModules(framework: Framework) {
   configureCollectionModule(framework);
   configureNavigationModule(framework);
   configureTagModule(framework);
-  configureCloudModule(framework);
-  configureQuotaModule(framework);
+  // configureCloudModule(framework);
+  // configureQuotaModule(framework);
   configurePermissionsModule(framework);
   configureShareDocsModule(framework);
   configureShareSettingModule(framework);
-  configureTelemetryModule(framework);
+  // configureTelemetryModule(framework);
   configurePDFModule(framework);
   configurePeekViewModule(framework);
   configureExplorerIconModule(framework);
@@ -130,6 +131,7 @@ export function configureCommonModules(framework: Framework) {
   configureIndexerEmbeddingModule(framework);
   configureCommentModule(framework);
   configureDocSummaryModule(framework);
-  configurePaywallModule(framework);
+  // configurePaywallModule(framework);
   configureIconPickerModule(framework);
+  configureNexusAIModule(framework);
 }
