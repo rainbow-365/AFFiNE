@@ -1,9 +1,9 @@
 import { Service } from '@toeverything/infra';
 
-import type { Doc } from '../../doc';
+import type { DocRecord } from '../../doc';
 
 export class DocProcessor extends Service {
-  constructor() {
+  constructor(private readonly idle: IdleService) {
     super();
   }
 
@@ -11,8 +11,11 @@ export class DocProcessor extends Service {
    * Extracts all text from a doc and returns it as a single string.
    * In a future version, this should handle chunking.
    */
-  extractText(doc: Doc): string {
-    const blocks = doc.blockSuiteDoc.getBlocks();
+  extractText(doc: any): string {
+    if (!doc || typeof doc.getBlocks !== 'function') {
+      return '';
+    }
+    const blocks = doc.getBlocks();
     let fullText = '';
 
     for (const block of blocks) {
@@ -24,5 +27,10 @@ export class DocProcessor extends Service {
     }
 
     return fullText.trim();
+  }
+
+  notifyChange(docId: string) {
+    console.log(`[DocProcessor] notifyChange called for doc: ${docId}`);
+    this.idle.notifyChange(docId);
   }
 }

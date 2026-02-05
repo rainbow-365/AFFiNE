@@ -5,6 +5,7 @@ export { DocCreated } from './events';
 export { DocScope } from './scopes/doc';
 export { DocService } from './services/doc';
 export { DocsService } from './services/docs';
+export { DocsStore } from './stores/docs';
 
 import type { Framework } from '@toeverything/infra';
 

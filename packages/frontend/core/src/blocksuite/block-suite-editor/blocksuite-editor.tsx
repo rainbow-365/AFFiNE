@@ -9,6 +9,11 @@ import {
   fontStyleOptions,
 } from '@affine/core/modules/editor-setting';
 import { FeatureFlagService } from '@affine/core/modules/feature-flag';
+import {
+  DocProcessor,
+  IdleService,
+  NexusLifecycleService,
+} from '@affine/core/modules/nexus-ai';
 import { WorkspaceService } from '@affine/core/modules/workspace';
 import track from '@affine/track';
 import { appendParagraphCommand } from '@blocksuite/affine/blocks/paragraph';
@@ -174,6 +179,53 @@ const BlockSuiteEditorImpl = ({
 
     std.command.exec(appendParagraphCommand);
   }, [affineEditorContainerProxy.host?.std, page, readonly, shared]);
+
+  const idleService = useService(IdleService);
+  const processor = useService(DocProcessor);
+  useService(NexusLifecycleService);
+
+  useEffect(() => {
+    console.log(`[Editor] Setting up listeners for doc: ${page.id}`);
+    if (shared || readonly || page.readonly) {
+      console.log(
+        `[Editor] Listeners skipped: shared=${shared}, readonly=${readonly}, page.readonly=${page.readonly}`
+      );
+      return;
+    }
+
+    if (!page.slots) {
+      console.error(
+        `[Editor] CRITICAL: page.slots is undefined for doc: ${page.id}`
+      );
+      return;
+    }
+
+    if (!page.slots.yUpdated || !page.slots.blockUpdated) {
+      console.warn(
+        `[Editor] Slots missing: yUpdated=${!!page.slots.yUpdated}, blockUpdated=${!!page.slots.blockUpdated}`
+      );
+    }
+
+    const sub = page.slots.yUpdated?.subscribe(() => {
+      console.log(`[Editor] yUpdated fired for doc: ${page.id}`);
+      processor.notifyChange(page.id);
+    });
+
+    const sub2 = page.slots.blockUpdated?.subscribe(() => {
+      console.log(`[Editor] blockUpdated fired for doc: ${page.id}`);
+      processor.notifyChange(page.id);
+    });
+
+    console.log(
+      `[Editor] Successfully subscribed to slots for doc: ${page.id}`
+    );
+
+    return () => {
+      console.log(`[Editor] Unsubscribing from slots for doc: ${page.id}`);
+      sub?.unsubscribe();
+      sub2?.unsubscribe();
+    };
+  }, [idleService, page, readonly, shared, processor]);
 
   useEffect(() => {
     const editorContainer = rootRef.current;

@@ -1,5 +1,5 @@
 import { Service } from '@toeverything/infra';
-import { debounceTime,Subject } from 'rxjs';
+import { debounceTime, Subject } from 'rxjs';
 
 export class IdleService extends Service {
   private readonly idleSubject$ = new Subject<string>(); // docId
@@ -12,6 +12,7 @@ export class IdleService extends Service {
   }
 
   notifyChange(docId: string) {
+    console.log(`[IdleService] notifyChange called for doc: ${docId}`);
     this.idleSubject$.next(docId);
   }
 }
