@@ -81,7 +81,7 @@ export function configureCommonModules(framework: Framework) {
   configureCollectionModule(framework);
   configureNavigationModule(framework);
   configureTagModule(framework);
-  // configureCloudModule(framework);
+  configureCloudModule(framework);
   // configureQuotaModule(framework);
   configurePermissionsModule(framework);
   configureShareDocsModule(framework);

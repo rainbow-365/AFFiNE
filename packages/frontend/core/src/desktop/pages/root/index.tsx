@@ -4,8 +4,8 @@ import { FrameworkScope, useService } from '@toeverything/infra';
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import { NexusDebugPanel } from '../../../modules/nexus-ai/view/debug-panel';
 import { GlobalDialogs } from '../../dialogs';
-import { NexusDebugPanel } from '../../modules/nexus-ai/view/debug-panel';
 import { CustomThemeModifier } from './custom-theme';
 import { FindInPagePopup } from './find-in-page/find-in-page-popup';
 
