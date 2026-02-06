@@ -132,6 +132,20 @@ const defaultDevServerConfig: DevServerConfiguration = {
     ],
   },
   proxy: [
+    // NexusAI: Local AI Services
+    {
+      context: '/api/chroma',
+      target: 'http://localhost:8000',
+      pathRewrite: { '^/api/chroma': '/api/v2' },
+      logLevel: httpProxyMiddlewareLogLevel,
+    },
+    {
+      context: '/api/ollama',
+      target: 'http://localhost:11434',
+      pathRewrite: { '^/api/ollama': '/api' },
+      logLevel: httpProxyMiddlewareLogLevel,
+    },
+    // AFFiNE Cloud Services
     {
       context: '/api',
       target: 'http://localhost:3010',

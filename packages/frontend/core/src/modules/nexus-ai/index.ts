@@ -7,6 +7,8 @@ import { DocProcessor } from './services/doc-processor';
 import { EmbeddingService } from './services/embedding';
 import { IdleService } from './services/idle';
 import { NexusLifecycleService } from './services/lifecycle';
+import { OllamaService } from './services/ollama';
+import { NexusTaskService } from './services/task';
 import { NexusTriggerService } from './services/trigger';
 
 export {
@@ -15,16 +17,20 @@ export {
   EmbeddingService,
   IdleService,
   NexusLifecycleService,
+  NexusTaskService,
   NexusTriggerService,
+  OllamaService,
 };
 
 export function configureNexusAIModule(framework: Framework) {
   framework
     .service(ChromaService)
-    .service(EmbeddingService)
+    .service(OllamaService)
+    .service(EmbeddingService, [OllamaService])
     .service(IdleService)
     .service(DocProcessor, [IdleService])
-    .service(NexusTriggerService)
+    .service(NexusTriggerService, [OllamaService])
+    .service(NexusTaskService)
     .scope(WorkspaceScope)
     .service(NexusLifecycleService, [
       ChromaService,
@@ -32,6 +38,7 @@ export function configureNexusAIModule(framework: Framework) {
       IdleService,
       DocProcessor,
       NexusTriggerService,
+      NexusTaskService,
       DocsService,
       DocsStore,
     ]);

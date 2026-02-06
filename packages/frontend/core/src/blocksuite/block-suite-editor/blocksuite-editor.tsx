@@ -200,16 +200,11 @@ const BlockSuiteEditorImpl = ({
       return;
     }
 
-    if (!page.slots.yUpdated || !page.slots.blockUpdated) {
+    if (!page.slots.blockUpdated) {
       console.warn(
-        `[Editor] Slots missing: yUpdated=${!!page.slots.yUpdated}, blockUpdated=${!!page.slots.blockUpdated}`
+        `[Editor] Slots missing: blockUpdated=${!!page.slots.blockUpdated}`
       );
     }
-
-    const sub = page.slots.yUpdated?.subscribe(() => {
-      console.log(`[Editor] yUpdated fired for doc: ${page.id}`);
-      processor.notifyChange(page.id);
-    });
 
     const sub2 = page.slots.blockUpdated?.subscribe(() => {
       console.log(`[Editor] blockUpdated fired for doc: ${page.id}`);
@@ -222,7 +217,6 @@ const BlockSuiteEditorImpl = ({
 
     return () => {
       console.log(`[Editor] Unsubscribing from slots for doc: ${page.id}`);
-      sub?.unsubscribe();
       sub2?.unsubscribe();
     };
   }, [idleService, page, readonly, shared, processor]);

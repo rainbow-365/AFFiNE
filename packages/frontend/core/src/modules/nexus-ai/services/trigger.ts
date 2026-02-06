@@ -1,5 +1,7 @@
 import { Service } from '@toeverything/infra';
 
+import { OllamaService } from './ollama';
+
 export interface Commitment {
   task: string;
   owner?: string;
@@ -7,6 +9,8 @@ export interface Commitment {
 }
 
 export class NexusTriggerService extends Service {
+  private readonly model = 'gemma2:2b';
+
   private readonly patterns = [
     // I'll/I will do X [by Y]
     {
@@ -27,7 +31,34 @@ export class NexusTriggerService extends Service {
     },
   ];
 
-  extractCommitments(text: string): Commitment[] {
+  constructor(private readonly ollama: OllamaService) {
+    super();
+  }
+
+  async extractCommitments(text: string): Promise<Commitment[]> {
+    // 1. Try LLM first for sophistication
+    try {
+      const prompt = `Extract tasks/commitments from this text. 
+Return ONLY a JSON array of objects with "task", "owner", and "dueDate" fields. 
+If none found, return [].
+Text: "${text}"`;
+
+      const resp = await this.ollama.generate(this.model, prompt);
+      if (resp?.response) {
+        // Simple extraction of JSON from response
+        const jsonMatch = resp.response.match(/\[.*\]/s);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        }
+      }
+    } catch (e) {
+      console.error(
+        '[NexusTrigger] LLM Extraction failed, falling back to regex',
+        e
+      );
+    }
+
+    // 2. Fallback to regex
     const commitments: Commitment[] = [];
     const lines = text.split('\n');
 
@@ -39,7 +70,7 @@ export class NexusTriggerService extends Service {
         const match = trimmed.match(regex);
         if (match) {
           commitments.push(handler(match));
-          break; // One match per line for now
+          break;
         }
       }
     }

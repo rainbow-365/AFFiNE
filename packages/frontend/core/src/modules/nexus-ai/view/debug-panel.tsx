@@ -2,9 +2,10 @@ import { useService } from '@toeverything/infra';
 import { useState } from 'react';
 
 import { ChromaService } from '../services/chroma';
-
+import { EmbeddingService } from '../services/embedding';
 export const NexusDebugPanel = () => {
   const chroma = useService(ChromaService);
+  const embedding = useService(EmbeddingService);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,12 @@ export const NexusDebugPanel = () => {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const data = await chroma.query('nexus_collection', query);
+      const vector = await embedding.embed(query);
+      const data = await chroma.query(
+        'nexus_collection',
+        query,
+        vector || undefined
+      );
       setResults(data?.documents?.[0] || []);
     } catch (e) {
       console.error(e);

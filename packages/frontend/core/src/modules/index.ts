@@ -1,4 +1,3 @@
-import { configureQuotaModule } from '@affine/core/modules/quota';
 import { type Framework } from '@toeverything/infra';
 
 import {
@@ -45,7 +44,6 @@ import { configureNexusAIModule } from './nexus-ai';
 import { configureNotificationModule } from './notification';
 import { configureOpenInApp } from './open-in-app';
 import { configureOrganizeModule } from './organize';
-import { configurePaywallModule } from './paywall';
 import { configurePDFModule } from './pdf';
 import { configurePeekViewModule } from './peek-view';
 import { configurePermissionsModule } from './permissions';
@@ -59,7 +57,6 @@ import {
 } from './storage';
 import { configureSystemFontFamilyModule } from './system-font-family';
 import { configureTagModule } from './tag';
-import { configureTelemetryModule } from './telemetry';
 import { configureTemplateDocModule } from './template-doc';
 import { configureAppThemeModule } from './theme';
 import { configureThemeEditorModule } from './theme-editor';
