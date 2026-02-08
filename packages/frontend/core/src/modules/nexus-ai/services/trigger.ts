@@ -15,7 +15,7 @@ export class NexusTriggerService extends Service {
     // I'll/I will do X [by Y]
     {
       regex:
-        /(?:I'll|I will|Need to|TODO:?)\s+([\w\s]+?)(?:\s+by\s+([\w\s]+))?\.?$/i,
+        /(?:I'll|I will|Need to|TODO:?|Must|Should)\s+([\w\s]{5,100}?)(?:\s+by\s+([\w\s]{3,30}))?\.?$/i,
       handler: (match: RegExpMatchArray): Commitment => ({
         task: match[1].trim(),
         dueDate: match[2]?.trim(),
@@ -23,10 +23,19 @@ export class NexusTriggerService extends Service {
     },
     // Follow up with Person
     {
-      regex: /(?:Follow up with)\s+([A-Z][a-z]+)/i,
+      regex: /(?:Follow up with|Contact|Call|Email|Message)\s+([A-Z][a-z]+)/i,
       handler: (match: RegExpMatchArray): Commitment => ({
         task: `Follow up with ${match[1]}`,
         owner: match[1],
+      }),
+    },
+    // Schedule/Meeting
+    {
+      regex:
+        /(?:Schedule|Organize|Set up)\s+(?:a\s+)?([\w\s]+?)(?:\s+(?:at|on|for)\s+([\w\s]+))?$/i,
+      handler: (match: RegExpMatchArray): Commitment => ({
+        task: `Schedule ${match[1].trim()}`,
+        dueDate: match[2]?.trim(),
       }),
     },
   ];
@@ -38,10 +47,11 @@ export class NexusTriggerService extends Service {
   async extractCommitments(text: string): Promise<Commitment[]> {
     // 1. Try LLM first for sophistication
     try {
-      const prompt = `Extract tasks/commitments from this text. 
+      const prompt = `You are a productivity assistant. Extract actionable tasks/commitments from this text.
 Return ONLY a JSON array of objects with "task", "owner", and "dueDate" fields. 
-If none found, return [].
-Text: "${text}"`;
+Be concise. If no tasks found, return [].
+
+Text: "${text.substring(0, 1000)}"`;
 
       const resp = await this.ollama.generate(this.model, prompt);
       if (resp?.response) {

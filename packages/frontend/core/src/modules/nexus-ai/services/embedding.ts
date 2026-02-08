@@ -1,19 +1,38 @@
 import { Service } from '@toeverything/infra';
+import { env, pipeline } from '@xenova/transformers';
 
-import { OllamaService } from './ollama';
+// Configure transformers.js to use local models
+env.localModelPath = '/models/';
+env.allowRemoteModels = false;
 
 export class EmbeddingService extends Service {
-  private readonly modelName = 'embeddinggemma:300m-qat-q4_0';
+  private extractor: any = null;
 
-  constructor(private readonly ollama: OllamaService) {
+  private readonly modelName = 'all-MiniLM-L6-v2';
+
+  constructor() {
     super();
+  }
+
+  private async getExtractor() {
+    if (!this.extractor) {
+      console.log(`[EmbeddingService] Loading model: ${this.modelName}`);
+      this.extractor = await pipeline('feature-extraction', this.modelName);
+    }
+    return this.extractor;
   }
 
   async embed(text: string): Promise<number[] | null> {
     try {
-      return await this.ollama.embeddings(this.modelName, text);
+      const extractor = await this.getExtractor();
+      const output = await extractor(text, {
+        pooling: 'mean',
+        normalize: true,
+      });
+
+      return Array.from(output.data);
     } catch (e) {
-      console.error('Embedding Error (Ollama):', e);
+      console.error('[EmbeddingService] Local Embedding Error:', e);
       return null;
     }
   }

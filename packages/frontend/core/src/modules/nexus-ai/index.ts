@@ -26,7 +26,7 @@ export function configureNexusAIModule(framework: Framework) {
   framework
     .service(ChromaService)
     .service(OllamaService)
-    .service(EmbeddingService, [OllamaService])
+    .service(EmbeddingService)
     .service(IdleService)
     .service(DocProcessor, [IdleService])
     .service(NexusTriggerService, [OllamaService])

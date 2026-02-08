@@ -1,5 +1,6 @@
 import { Service } from '@toeverything/infra';
 
+import { toast } from '../../../utils';
 import type { DocsService, DocsStore } from '../../doc';
 import { ChromaService } from './chroma';
 import { DocProcessor } from './doc-processor';
@@ -97,6 +98,9 @@ export class NexusLifecycleService extends Service {
     const commitments = await this.triggerService.extractCommitments(text);
     console.log(`[NexusLifecycle] Commitments found: ${commitments.length}`);
     if (commitments.length > 0) {
+      toast(
+        `NexusAI: Extracted ${commitments.length} task${commitments.length > 1 ? 's' : ''}`
+      );
       commitments.forEach(c => {
         this.taskService.addTask(docId, c);
       });
