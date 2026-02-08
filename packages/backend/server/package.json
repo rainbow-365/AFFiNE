@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "affine bundle -p @affine/server",
-    "dev": "nodemon ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development node --loader ts-node/esm --experimental-specifier-resolution=node ./src/index.ts",
     "dev:mail": "email dev -d src/mails",
     "test": "ava --concurrency 1 --serial",
     "test:copilot": "ava \"src/__tests__/copilot-*.spec.ts\"",
@@ -153,6 +153,7 @@
     "react-email": "4.0.11",
     "sinon": "^21.0.1",
     "supertest": "^7.1.4",
+    "tsx": "^4.19.4",
     "why-is-node-running": "^3.2.2"
   },
   "nodemonConfig": {

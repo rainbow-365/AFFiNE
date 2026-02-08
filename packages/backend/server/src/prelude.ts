@@ -17,8 +17,12 @@ function loadPrivateKey() {
 
 function load() {
   let isPrivateKeyFromEnv = !!process.env.AFFINE_PRIVATE_KEY;
-  // load `.env` under pwd
+  // load `.env` under current workspace (packages/backend/server)
   config();
+  // also load monorepo root .env if present (two levels up from workspace)
+  config({
+    path: join(process.cwd(), '../../../.env'),
+  });
   // load `.env` under user config folder
   config({
     path: join(CUSTOM_CONFIG_PATH, '.env'),
