@@ -71,6 +71,8 @@ download
 
 # Cache
 .eslintcache
+.webpack-cache
+*-development__compiler*__/
 next-env.d.ts
 .rollup.cache
 

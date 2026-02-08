@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { getBuildConfig } from '@affine-tools/utils/build-config';
 import { Path, ProjectRoot } from '@affine-tools/utils/path';
@@ -79,6 +80,17 @@ export function createHTMLTargetConfig(
     name: entry['index'],
     dependencies: deps,
     context: ProjectRoot.value,
+    cache: {
+      type: 'filesystem',
+      cacheDirectory: ProjectRoot.join(
+        '.webpack-cache',
+        pkg.name.replace(/[@/]/g, '-'),
+        'html'
+      ).value,
+      buildDependencies: {
+        config: [fileURLToPath(import.meta.url)],
+      },
+    },
     experiments: {
       topLevelAwait: true,
       outputModule: false,
@@ -384,6 +396,17 @@ export function createWorkerTargetConfig(
   return {
     name: entry,
     context: ProjectRoot.value,
+    cache: {
+      type: 'filesystem',
+      cacheDirectory: ProjectRoot.join(
+        '.webpack-cache',
+        pkg.name.replace(/[@/]/g, '-'),
+        'worker'
+      ).value,
+      buildDependencies: {
+        config: [fileURLToPath(import.meta.url)],
+      },
+    },
     experiments: {
       topLevelAwait: true,
       outputModule: false,
@@ -514,6 +537,17 @@ export function createNodeTargetConfig(
   return {
     name: entry,
     context: ProjectRoot.value,
+    cache: {
+      type: 'filesystem',
+      cacheDirectory: ProjectRoot.join(
+        '.webpack-cache',
+        pkg.name.replace(/[@/]/g, '-'),
+        'node'
+      ).value,
+      buildDependencies: {
+        config: [fileURLToPath(import.meta.url)],
+      },
+    },
     experiments: {
       topLevelAwait: true,
       outputModule: pkg.packageJson.type === 'module',
