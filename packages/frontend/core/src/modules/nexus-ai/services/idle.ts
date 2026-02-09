@@ -9,6 +9,7 @@ export class IdleService extends Service {
 
   constructor() {
     super();
+    console.log('[IdleService] initialized');
   }
 
   notifyChange(docId: string) {

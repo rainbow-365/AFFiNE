@@ -15,7 +15,7 @@ export class NexusTriggerService extends Service {
     // I'll/I will do X [by Y]
     {
       regex:
-        /(?:I'll|I will|Need to|TODO:?|Must|Should)\s+([\w\s]{5,100}?)(?:\s+by\s+([\w\s]{3,30}))?\.?$/i,
+        /(?:I'll|I will|I need to|We need to|Need to|I have to|We have to|Must|I must|Should|TODO:?|To do)\s+(.{5,120}?)(?:\s+by\s+([\w\s]{3,40}))?[.!?]?$/i,
       handler: (match: RegExpMatchArray): Commitment => ({
         task: match[1].trim(),
         dueDate: match[2]?.trim(),

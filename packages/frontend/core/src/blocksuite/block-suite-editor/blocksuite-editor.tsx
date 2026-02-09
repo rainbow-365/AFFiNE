@@ -182,7 +182,7 @@ const BlockSuiteEditorImpl = ({
 
   const idleService = useService(IdleService);
   const processor = useService(DocProcessor);
-  useService(NexusLifecycleService);
+  const lifecycle = useService(NexusLifecycleService);
 
   useEffect(() => {
     console.log(`[Editor] Setting up listeners for doc: ${page.id}`);
@@ -209,6 +209,9 @@ const BlockSuiteEditorImpl = ({
     const sub2 = page.slots.blockUpdated?.subscribe(() => {
       console.log(`[Editor] blockUpdated fired for doc: ${page.id}`);
       processor.notifyChange(page.id);
+      lifecycle.scheduleProcess(page.id, page);
+      // Fire immediately as well to keep Phase 2 responsive in dev/test
+      lifecycle.handleIdle(page.id, page).catch(console.error);
     });
 
     console.log(
@@ -219,7 +222,7 @@ const BlockSuiteEditorImpl = ({
       console.log(`[Editor] Unsubscribing from slots for doc: ${page.id}`);
       sub2?.unsubscribe();
     };
-  }, [idleService, page, readonly, shared, processor]);
+  }, [idleService, lifecycle, page, readonly, shared, processor]);
 
   useEffect(() => {
     const editorContainer = rootRef.current;
