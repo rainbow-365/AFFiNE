@@ -210,8 +210,6 @@ const BlockSuiteEditorImpl = ({
       console.log(`[Editor] blockUpdated fired for doc: ${page.id}`);
       processor.notifyChange(page.id);
       lifecycle.scheduleProcess(page.id, page);
-      // Fire immediately as well to keep Phase 2 responsive in dev/test
-      lifecycle.handleIdle(page.id, page).catch(console.error);
     });
 
     console.log(

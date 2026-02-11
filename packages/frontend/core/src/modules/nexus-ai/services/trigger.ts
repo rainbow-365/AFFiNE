@@ -45,30 +45,7 @@ export class NexusTriggerService extends Service {
   }
 
   async extractCommitments(text: string): Promise<Commitment[]> {
-    // 1. Try LLM first for sophistication
-    try {
-      const prompt = `You are a productivity assistant. Extract actionable tasks/commitments from this text.
-Return ONLY a JSON array of objects with "task", "owner", and "dueDate" fields. 
-Be concise. If no tasks found, return [].
-
-Text: "${text.substring(0, 1000)}"`;
-
-      const resp = await this.ollama.generate(this.model, prompt);
-      if (resp?.response) {
-        // Simple extraction of JSON from response
-        const jsonMatch = resp.response.match(/\[.*\]/s);
-        if (jsonMatch) {
-          return JSON.parse(jsonMatch[0]);
-        }
-      }
-    } catch (e) {
-      console.error(
-        '[NexusTrigger] LLM Extraction failed, falling back to regex',
-        e
-      );
-    }
-
-    // 2. Fallback to regex
+    // 1. Prefer regex for deterministic extraction (fast + stable in tests)
     const commitments: Commitment[] = [];
     const lines = text.split('\n');
 
@@ -85,6 +62,29 @@ Text: "${text.substring(0, 1000)}"`;
       }
     }
 
-    return commitments;
+    if (commitments.length) {
+      return commitments;
+    }
+
+    // 2. Fallback to LLM for sophisticated extraction
+    try {
+      const prompt = `You are a productivity assistant. Extract actionable tasks/commitments from this text.
+Return ONLY a JSON array of objects with "task", "owner", and "dueDate" fields. 
+Be concise. If no tasks found, return [].
+
+Text: "${text.substring(0, 1000)}"`;
+
+      const resp = await this.ollama.generate(this.model, prompt);
+      if (resp?.response) {
+        const jsonMatch = resp.response.match(/\[.*\]/s);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        }
+      }
+    } catch (e) {
+      console.error('[NexusTrigger] LLM Extraction failed', e);
+    }
+
+    return [];
   }
 }

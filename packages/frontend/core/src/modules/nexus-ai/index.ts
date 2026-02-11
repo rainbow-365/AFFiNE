@@ -30,8 +30,8 @@ export function configureNexusAIModule(framework: Framework) {
     .service(IdleService)
     .service(DocProcessor, [IdleService])
     .service(NexusTriggerService, [OllamaService])
-    .service(NexusTaskService)
     .scope(WorkspaceScope)
+    .service(NexusTaskService)
     .service(NexusLifecycleService, [
       ChromaService,
       EmbeddingService,

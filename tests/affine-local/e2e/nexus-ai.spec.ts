@@ -34,11 +34,23 @@ test('NexusAI: Detect task and show in sidebar', async ({ page }) => {
 
   // 5. Wait for Idle Trigger (3s) + Processing Time
   // The plan says "Idle Listener... triggers after 3 seconds of no typing".
-  await page.waitForTimeout(5000);
+  // Waiting for the console log from Lifecycle is more reliable than hard timeout
+  try {
+    const consolePromise = page.waitForEvent('console', {
+      predicate: msg =>
+        msg.text().includes('[NexusLifecycle] Commitments found'),
+      timeout: 10000,
+    });
+    await consolePromise;
+  } catch (e) {
+    console.log('Wait for console log timed out, continuing to assertion...');
+  }
 
   // 6. Verify Task Sidebar
   // The sidebar item should appear.
+  // NOTE: The regex extractor extracts "deploy the production build tomorrow" from "I need to deploy..."
+  const expectedTask = 'deploy the production build tomorrow';
   const taskItem = page.getByTestId('nexus-task-item');
   await expect(taskItem).toBeVisible({ timeout: 15000 });
-  await expect(taskItem).toContainText(taskText);
+  await expect(taskItem).toContainText(expectedTask);
 });

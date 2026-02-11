@@ -26,11 +26,11 @@ export class NexusLifecycleService extends Service {
   ) {
     super();
 
-    console.log('[NexusLifecycle] Constructor started');
+    console.error('[NexusLifecycle] Constructor started');
     // Connect the pipeline
     if (this.idle && this.idle.idle$) {
       const sub = this.idle.idle$.subscribe(docId => {
-        console.log(`[NexusLifecycle] Received idle event for doc: ${docId}`);
+        console.error(`[NexusLifecycle] Received idle event for doc: ${docId}`);
         this.handleIdle(docId).catch(console.error);
       });
       this.disposables.push(() => sub.unsubscribe());
@@ -59,15 +59,17 @@ export class NexusLifecycleService extends Service {
   }
 
   async handleIdle(docId: string, docStoreOverride?: any) {
-    console.log(`[NexusLifecycle] Handling idle for ${docId}`);
+    console.error(`[NexusLifecycle] Handling idle for ${docId}`);
     const docStore = docStoreOverride ?? this.docsStore.getBlockSuiteDoc(docId);
     if (!docStore) {
-      console.warn(`[NexusLifecycle] Could not find doc store for ${docId}`);
+      console.error(`[NexusLifecycle] Could not find doc store for ${docId}`);
       return;
     }
 
     const text = this.processor.extractText(docStore);
-    console.log(`[NexusLifecycle] Extracted text length: ${text?.length || 0}`);
+    console.error(
+      `[NexusLifecycle] Extracted text length: ${text?.length || 0}`
+    );
     if (!text) return;
 
     const docRecord = this.docsService.list.doc$(docId).value;
@@ -123,14 +125,15 @@ export class NexusLifecycleService extends Service {
     }
 
     // Phase 2: Proactive Triggers
-    console.log(`[NexusLifecycle] Extracting commitments...`);
+    console.error(`[NexusLifecycle] Extracting commitments...`);
     const commitments = await this.triggerService.extractCommitments(text);
-    console.log(`[NexusLifecycle] Commitments found: ${commitments.length}`);
+    console.error(`[NexusLifecycle] Commitments found: ${commitments.length}`);
     if (commitments.length > 0) {
       toast(
         `NexusAI: Extracted ${commitments.length} task${commitments.length > 1 ? 's' : ''}`
       );
       commitments.forEach(c => {
+        console.error(`[NexusLifecycle] Adding task: ${c.task}`);
         this.taskService.addTask(docId, c);
       });
     }

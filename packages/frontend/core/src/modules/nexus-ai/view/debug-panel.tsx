@@ -14,11 +14,15 @@ export const NexusDebugPanel = () => {
     setLoading(true);
     try {
       const vector = await embedding.embed(query);
-      const data = await chroma.query(
-        'nexus_collection',
-        query,
-        vector || undefined
-      );
+      if (!vector || vector.length === 0) {
+        console.error(
+          '[NexusAI] Embedding unavailable. Run `yarn setup:models` to download the local ONNX model.'
+        );
+        setResults(['Embedding unavailable (model missing?).']);
+        return;
+      }
+
+      const data = await chroma.query('nexus_collection', query, vector);
       setResults(data?.documents?.[0] || []);
     } catch (e) {
       console.error(e);

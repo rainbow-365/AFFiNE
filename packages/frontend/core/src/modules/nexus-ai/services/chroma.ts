@@ -45,20 +45,25 @@ export class ChromaService extends Service {
   async query(
     collectionName: string,
     text: string,
-    vector?: number[],
+    vector: number[],
     nResults: number = 5
   ) {
     try {
+      if (!vector || vector.length === 0) {
+        throw new Error(
+          'Embedding vector is required to query Chroma (API v2 expects query_embeddings)'
+        );
+      }
+
       const collectionId = await this.getOrCreateCollection(collectionName);
       if (!collectionId) throw new Error('Collection not found/created');
 
       const body: any = {
         n_results: nResults,
+        query_embeddings: [vector],
       };
 
-      if (vector) {
-        body.query_embeddings = [vector];
-      } else {
+      if (text) {
         body.query_texts = [text];
       }
 
